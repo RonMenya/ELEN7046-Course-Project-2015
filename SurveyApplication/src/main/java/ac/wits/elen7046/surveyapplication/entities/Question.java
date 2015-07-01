@@ -1,15 +1,11 @@
 package ac.wits.elen7046.surveyapplication.entities;
 
 
-import java.util.ArrayList;
 import java.util.List;
 import javax.xml.bind.annotation.XmlRootElement;
 
 
-/**
- *
- * @author Ronald Menya
- */
+
 @XmlRootElement
 public class Question {
 
@@ -32,10 +28,6 @@ public class Question {
 	}
 
 	private QuestionType questionType;
-    
-    public Question () {
-        this.id = System.currentTimeMillis();
-    }
     
     /**
      * 

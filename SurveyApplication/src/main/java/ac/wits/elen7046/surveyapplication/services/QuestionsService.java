@@ -13,7 +13,7 @@ public interface QuestionsService {
     
     public List<Question> getAll();
     public Question getQuestion(long questionId);
-    public Question addQuestion(Question question);
-    public Question updateQuestion(Question question);
+    public boolean addQuestion(Question question);
+    public boolean updateQuestion(Question question);
     public void deleteQuestion(long questionId);
 }

@@ -3,7 +3,7 @@ var updatedQuestionIndex = 0;
 
 function getAllQuestion() {
     jQuery.ajax({
-        url: "http://localhost:8080/SurveyApplication/resources/questions/",
+        url: "http://localhost:8080/SurveyApplication/resources/questions/getall",
         type: "GET",
         contentType: 'application/json; charset=utf-8',
         success: function(resultData) {
@@ -29,17 +29,38 @@ function viewCreateQuestionPanel() {
     return showTextOnlyQuestion();
 }
 
-function viewUpdateQuestionPanel() {
+function updateQuestion() {
+	
+    var data = {"id":11,"options": options,"questionType":answerType,"text":content};
     jQuery.ajax({
-        url: "http://localhost:8080/SurveyApplication/resources/questions/",
+        url: "http://localhost:8080/SurveyApplication/resources/questions/add",
+        type: "POST",
+        contentType: 'application/json; charset=utf-8',
+        data: JSON.stringify(data),
+        success: function(resultData) {
+            alert("Question was added");
+        },
+        error : function(jqXHR, textStatus, errorThrown) {
+            alert(errorThrown);
+        },
+
+        timeout: 120000,
+    });
+	
+}
+function viewUpdateQuestionPanel() {
+
+    
+    jQuery.ajax({
+    	url: "http://localhost:8080/SurveyApplication/resources/questions/getall",
         type: "GET",
         contentType: 'application/json; charset=utf-8',
         success: function(resultData) {
-            var table = "<label for=\"comment\">Please select the question to be updated.</label><br/><table id=\"updatable-table\" class=\"table table-striped\"><thead><tr><th>Question Number</th><th>Question</th></tr></thead><tbody>";
+            var table = "<label for=\"comment\">Please select the question to be updated.</label><br/><table id=\"updatable-table\" class=\"table table-striped\"><thead><tr><th>Question Number</th><th>Question</th></tr><tr><th>Question ID</th><th></thead><tbody>";
             var questionNumber = 1;
             
             for (var i = 0; i < resultData.length; i++) {
-                table = table + "<tr onclick=\"showPopup(this);\"><td>" + questionNumber + "</td><td>" + resultData[i].text + "</td></tr>";
+                table = table + "<tr onclick=\"showPopup(this);\"><td>" + questionNumber + "</td><td>" + resultData[i].text + "</td><td>" + resultData[i].id + "</td></tr>";
                 questionNumber++;
             }
 
@@ -55,16 +76,18 @@ function viewUpdateQuestionPanel() {
 }
 
 function viewDeleteQuestionPanel() {
+	
+	var data = {"id":4};
     jQuery.ajax({
-        url: "http://localhost:8080/SurveyApplication/resources/questions/",
+        url: "http://localhost:8080/SurveyApplication/resources/questions/getall",
         type: "GET",
         contentType: 'application/json; charset=utf-8',
         success: function(resultData) {
-            var table = "<label for=\"comment\">Please select the question to be deleted.</label><br/><table class=\"table table-striped\"><thead><tr><th>Question Number</th><th>Question</th></tr></thead><tbody>";
+            var table = "<label for=\"comment\">Please select the question to be deleted.</label><br/><table class=\"table table-striped\"><thead><tr><th>Question Number</th><th>Question</th></tr><tr><th>Question ID</th><th></thead><tbody>";
             var questionNumber = 1;
             
             for (var i = 0; i < resultData.length; i++) {
-                table = table + "<tr onclick=\"showConfirmDeletePopup(this);\"><td>" + questionNumber + "</td><td>" + resultData[i].text + "</td></tr>";
+                table = table + "<tr onclick=\"showConfirmDeletePopup(this);\"><td>" + questionNumber + "</td><td>" + resultData[i].text + "</td><td>" + resultData[i].id + "</td></tr>";
                 questionNumber++;
             }
 
@@ -193,12 +216,12 @@ function submitQuestion() {
     
     var data = {"id":11,"options": options,"questionType":answerType,"text":content};
     jQuery.ajax({
-        url: "http://10.40.26.151:8080/SurveyApplication/resources/questions/",
+        url: "http://localhost:8080/SurveyApplication/resources/questions/add",
         type: "POST",
         contentType: 'application/json; charset=utf-8',
         data: JSON.stringify(data),
         success: function(resultData) {
-            
+            alert("Question was added");
         },
         error : function(jqXHR, textStatus, errorThrown) {
             alert(errorThrown);
@@ -210,13 +233,16 @@ function submitQuestion() {
 
 function showPopup(obj) {
     updatedQuestionIndex = obj.cells[0].firstChild.data;
+    
     var text = obj.cells[1].firstChild.data;
+    var qid = obj.cells[2].firstChild.data;
+    
     var question = "<div class=\"container\" id=\"bubbles_container\">" 
                 +"<label for=\"comment\">Question:</label><textarea class=\"form-control\" rows=\"2\"  id=\"comment\">" + text + "</textarea>"
                 + "<br/><div><label for=\"comment\">Answer type:</label><br/><label class=\"radio-inline\"><input type=\"radio\" onclick=\"showTextOnlyQuestion();\" name=\"Text\">Text"
                 + "</label><label class=\"radio-inline\"><input type=\"radio\" onclick=\"showSingleSelectionQuestion();\" name=\"SingleSelection\">Single Selection</label><label class=\"radio-inline\">"
                 + "<input type=\"radio\" onclick=\"showMultipleSelectionQuestion();\" name=\"MultipleSelection\">Multiple Selection</label></div><br/>"
-                + "<div class=\"col-sm-offset-2 col-sm-10\"><button type=\"submit\" onclick=\"unloadPopup();\"  class=\"btn btn-primary pull-right\">Update</button></div></div>";
+                + "<div class=\"col-sm-offset-2 col-sm-10\"><button type=\"submit\" onclick=\"unloadUpdatePopup(\'" + qid + "\');\"  class=\"btn btn-primary pull-right\">Update</button></div></div>";
     document.getElementById("technologies-pop-up").innerHTML = question;
     $("#technologies-pop-up").fadeIn("slow");
     $("#technologies-pop-up").css({     
@@ -226,10 +252,12 @@ function showPopup(obj) {
 }
 
 function showConfirmDeletePopup(obj) {
+    var qid = obj.cells[2].firstChild.data;
     var text = obj.cells[1].firstChild.data;
+
     var question = "<div class=\"container\" id=\"bubbles_container\" style=\"width: 600px; height: 200px; margin: 0 auto;\">" 
-                +"<label for=\"comment\">Are you sure you want to delete question: <br/>" + text
-                + "<div class=\"col-sm-offset-2 col-sm-10\"><button type=\"submit\" onclick=\"unloadPopup();\"  class=\"btn btn-primary pull-right\">OK</button></div></div>";
+                +"<label for=\"comment\">Are you sure you want to delete question: <br/>" + text + " with id = " + qid
+                + "<div class=\"col-sm-offset-2 col-sm-10\"><button type=\"submit\" onclick=\"unloadPopup(\'" + qid + "\');\"  class=\"btn btn-primary pull-right\">OK</button></div></div>";
     document.getElementById("technologies-pop-up").innerHTML = question;
     $('#technologies-pop-up').fadeIn("slow");
     $("#main_container").css({       
@@ -238,8 +266,14 @@ function showConfirmDeletePopup(obj) {
 
 }
 
-function unloadPopup() {    
-    var textArea = document.getElementById("comment");
+function unloadUpdatePopup(qid) {    
+    
+	//var inputs = document.getElementsByTagName("input")[0].id;
+	//var qid = question.cells[2].firstChild.data;
+	alert("updating question with id = " + qid);
+	updateQuestion(qid);
+	alert("question updated " + qid + " is updated ...");
+	var textArea = document.getElementById("comment");
     var content = "";
     
     if (textArea) {
@@ -249,6 +283,96 @@ function unloadPopup() {
     var row = document.getElementById("updatable-table").rows[updatedQuestionIndex];
     row.cells[1].firstChild.data = content ;
     // TO Unload the Popupbox
+    $('#technologies-pop-up').fadeOut("slow");
+    $("#main_container").css({        
+            "opacity": "1" 
+    });
+    
+    
+}
+
+
+function updateQuestion(qid) {
+	
+	var textArea = document.getElementById("comment");
+    var content = "";
+    
+    if (textArea) {
+        content = textArea.value;
+        
+        if (content == null || content == "") {
+            alert("question must be filled out");
+            return false;
+        }
+    }
+    
+    var options = [];
+    var answerType = "TEXT";    
+    var data = {"id":qid,"options": options,"questionType":answerType,"text":content};
+    jQuery.ajax({
+        url: "http://localhost:8080/SurveyApplication/resources/questions/update",
+        type: "PUT",
+        contentType: 'application/json; charset=utf-8',
+        data: JSON.stringify(data),
+        success: function(resultData) {
+            alert("Question was updated");
+        },
+        error : function(jqXHR, textStatus, errorThrown) {
+            alert(errorThrown);
+        },
+
+        timeout: 120000,
+    });
+    
+ // TO Unload the Popupbox
+    $('#technologies-pop-up').fadeOut("slow");
+    $("#main_container").css({        
+            "opacity": "1" 
+    });
+}
+
+function unloadDeletePopup(qid) {    
+	
+	alert("deleting question with id = " + qid);
+	deleteQuestion(qid);
+	alert("question with id = " + qid + " is deleted ...");
+	var textArea = document.getElementById("comment");
+	var content = "";
+	
+	if (textArea) {
+		content = textArea.value;
+	}
+	
+	var row = document.getElementById("updatable-table").rows[updatedQuestionIndex];
+	row.cells[1].firstChild.data = content ;
+	// TO Unload the Popupbox
+	$('#technologies-pop-up').fadeOut("slow");
+	$("#main_container").css({        
+		"opacity": "1" 
+	});	
+	
+}
+
+
+function deleteQuestion(q_id) {
+	
+	var data = parseInt(q_id);
+    jQuery.ajax({
+        url: "http://localhost:8080/SurveyApplication/resources/questions/remove",
+        type: "DELETE",
+        data: JSON.stringify(data),
+        contentType: 'application/json; charset=utf-8',
+        success: function(resultData) {
+        	
+        },
+        error : function(jqXHR, textStatus, errorThrown) {
+            alert(errorThrown);
+        },
+
+        timeout: 120000,
+    });
+    
+ // TO Unload the Popupbox
     $('#technologies-pop-up').fadeOut("slow");
     $("#main_container").css({        
             "opacity": "1" 

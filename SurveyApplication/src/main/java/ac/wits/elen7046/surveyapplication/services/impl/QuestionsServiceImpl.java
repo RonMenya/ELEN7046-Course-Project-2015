@@ -8,50 +8,25 @@ package ac.wits.elen7046.surveyapplication.services.impl;
 
 import ac.wits.elen7046.surveyapplication.entities.Question;
 import ac.wits.elen7046.surveyapplication.entities.QuestionType;
+import ac.wits.elen7046.surveyapplication.factory.DAOFactory;
 import ac.wits.elen7046.surveyapplication.services.QuestionsService;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- *
- * @author f3418944
- */
 public class QuestionsServiceImpl implements QuestionsService{
     
     private Map<Long, Question> questions = questions = new HashMap<Long, Question>();
     
     public QuestionsServiceImpl() {
-        for (int i = 1; i < 10; i++) {
-            Question question = new Question();
-            
-            if (i % 2 == 0) { 
-               question.setQuestionType(QuestionType.TEXT);   
-               question.setOptions(new ArrayList<String>());
-               
-            } else {
-               question.setQuestionType(QuestionType.MULTIPLE_CHOICE);
-               ArrayList<String> options = new ArrayList<String>();
-               options.add("option 1");
-               options.add("option 2");
-               options.add("option 3");
-               question.setOptions(options);
-            }
-            
-            question.setId(i);
-            question.setText("This is question " + i);
-            questions.put(question.getId(), question);
-            System.out.println("XXXXXXXXXXXXXX: " + question.getOptions());
-        }
-        
-        Question question = new Question();
-        question.setQuestionType(QuestionType.YES_NO);   
-        question.setOptions(new ArrayList<String>());
+
     }
 
     public List<Question> getAll() {
-        return new ArrayList<Question>(questions.values());
+    	
+    	return DAOFactory.getQuestionDAO().getAll();
     }
 
     public Question getQuestion(long questionId) {
@@ -60,18 +35,22 @@ public class QuestionsServiceImpl implements QuestionsService{
         return question;
     }
 
-    public Question addQuestion(Question question) {
-        question.setId(questions.size() + 1);
-        return questions.put(question.getId(), question);
+    public boolean addQuestion(Question question) {
+    	boolean isQuestionAdded = DAOFactory.getQuestionDAO().addQuestion(question);
+        System.out.println("Has question being added? " + isQuestionAdded);
+        return isQuestionAdded;
                 
     }
 
-    public Question updateQuestion(Question question) {
-        return questions.put(question.getId(), question);
+    public boolean updateQuestion(Question question) {
+    	boolean isQuestionUpdated = false;
+    	isQuestionUpdated = DAOFactory.getQuestionDAO().updateQuestion(question);
+    	return isQuestionUpdated;
     }
 
     public void deleteQuestion(long questionId) {
-        questions.remove(questionId);
+    	DAOFactory.getQuestionDAO().deleteQuestion(questionId);
+    	System.out.println("Question with id = " + questionId + " was deleted.");
     }
     
     public static void main(String[] args) {

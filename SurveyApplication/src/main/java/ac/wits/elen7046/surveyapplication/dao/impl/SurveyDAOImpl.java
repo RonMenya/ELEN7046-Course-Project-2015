@@ -3,6 +3,9 @@ package ac.wits.elen7046.surveyapplication.dao.impl;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.List;
+
+import javax.ws.rs.core.MultivaluedHashMap;
 
 import ac.wits.elen7046.surveyapplication.dao.SurveyDAO;
 import ac.wits.elen7046.surveyapplication.dao.connection.DBConnection;
@@ -25,7 +28,8 @@ public class SurveyDAOImpl implements SurveyDAO {
 		try {
 			conn = DBConnection.getDBConnection();
 			
-			int locationId = DAOFactory.getLocationDAO().getLocationId(survey.getLocation());
+		   // private MultivaluedHashMap<Long, List<String>> questionsToAnswersMapping = new MultivaluedHashMap<Long, List<String>>();
+
 			//survey.getQuestionsToAnswersMapping();
 			
 			statement = conn.prepareStatement(selectAllQuestion);
