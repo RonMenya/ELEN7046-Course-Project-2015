@@ -1,20 +1,16 @@
+
 package ac.wits.elen7046.surveyapplication.entities;
 
 
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+
 import javax.ws.rs.core.MultivaluedHashMap;
-import javax.ws.rs.core.MultivaluedMap;
 
 
-/**
- *
- * @author Ronald Menya
- */
+
 public class Survey {
-    
+   
     private long id;
     private String name;
     private double version;
@@ -25,7 +21,6 @@ public class Survey {
     private Date creationDate;
     private SurveyStatus surveyStatus;
     private MultivaluedHashMap<Long, List<String>> questionsToAnswersMapping = new MultivaluedHashMap<Long, List<String>>();
-    
     
     public long getId() {
         return this.id;
@@ -74,7 +69,7 @@ public class Survey {
     public void setQuestions(List<Question> questions) {
         this.questions = questions;
     }
-    
+   
     public void addQuestion(Question question) {
         this.questions.add(question);
     }
@@ -110,6 +105,5 @@ public class Survey {
     public void setQuestionsToAnswersMapping(MultivaluedHashMap<Long, List<String>> questionsToAnswersMapping) {
         this.questionsToAnswersMapping = questionsToAnswersMapping;
     }
-    
     
 }
